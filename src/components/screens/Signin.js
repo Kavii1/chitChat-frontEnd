@@ -16,7 +16,7 @@ const Signin = () => {
       M.toast({ html: 'Invalid Email', classes: '#b71c1c red darken-4' })
       return
     }
-    fetch("/signin", {
+    fetch("https://vercel-server-brown.vercel.app/signin", {
       method: "post",
       headers: {
         "Content-Type": "application/json"
