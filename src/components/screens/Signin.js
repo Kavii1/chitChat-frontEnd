@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../App'
 
 const Signin = () => {
-  const { state, dispatch } = useContext(UserContext)
+  const { dispatch } = useContext(UserContext)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
@@ -16,7 +16,7 @@ const Signin = () => {
       M.toast({ html: 'Invalid Email', classes: '#b71c1c red darken-4' })
       return
     }
-    fetch("https://vercel-server-brown.vercel.app/signin", {
+    fetch("/signin", {
       method: "post",
       headers: {
         "Content-Type": "application/json"
