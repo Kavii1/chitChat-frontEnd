@@ -1,104 +1,152 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import M from "materialize-css"
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import M from "materialize-css";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [image, setImage] = useState('')
-  const [url, setUrl] = useState('')
-  const navigate = useNavigate()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [image, setImage] = useState("");
+  const [url, setUrl] = useState("");
+  const navigate = useNavigate();
 
+  // const BASE_URL = "http://localhost:5000/";
+  const BASE_URL ="https://vercel-server-brown.vercel.app/"
   useEffect(() => {
-    if(url){
-      uploadFields()
+    if (url) {
+      uploadFields();
     }
   }, [url]);
 
   const uploadProfile = () => {
-    const data = new FormData()
-    data.append("file",image)
-    data.append("upload_preset","insta-clone")
-    data.append("cloud_name","duriiuajr")
-    fetch('https://api.cloudinary.com/v1_1/duriiuajr/image/upload',{
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "insta-clone");
+    data.append("cloud_name", "duriiuajr");
+    fetch("https://api.cloudinary.com/v1_1/duriiuajr/image/upload", {
       method: "post",
-      body: data
+      body: data,
     })
-    .then(res=>res.json())
-    .then(data=>{
-      setUrl(data.url)
-    })
-    .catch(err=>console.log(err))
-  }
+      .then((res) => res.json())
+      .then((data) => {
+        setUrl(data.url);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const uploadFields = () => {
-    if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)){
-      M.toast({html: 'Invalid Email', classes:'#b71c1c red darken-4'})
-      return
+    if (
+      !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        email
+      )
+    ) {
+      M.toast({ html: "Invalid Email", classes: "#b71c1c red darken-4" });
+      return;
     }
-    fetch("/signup",{
-      method: "post",
-      headers:{
-        "Content-Type": "application/json"
+    fetch("http://localhost:5000/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      body:JSON.stringify({
+      body: JSON.stringify({
         name,
         email,
         password,
-        pic: url
+        pic: url,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          M.toast({ html: data.error, classes: "#b71c1c red darken-4" });
+        } else {
+          M.toast({ html: data.message, classes: "#00e676 green accent-3" });
+          navigate("/signin");
+        }
       })
-    }).then(res=>res.json())
-    .then(data=>{
-      if(data.error){
-        M.toast({html: data.error, classes:'#b71c1c red darken-4'})
-      }
-      else{
-        M.toast({html: data.message, classes:'#00e676 green accent-3'})
-        navigate('/signin')
-      }
-    })
-    .catch(err=>{
-      console.log(err)
-    })
-  }
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // const PostData = (e) => {
+  //   e.preventDefault()
+  //   if(image){
+  //     uploadProfile()
+  //   }
+  //   else{
+  //     uploadFields()
+  //   }
+  // }
 
   const PostData = (e) => {
     e.preventDefault()
-    if(image){
-      uploadProfile()
-    }
-    else{
-      uploadFields()
-    }
-  }
+    let data = {
+      name: name,
+      email: email,
+      password: password,
+    };
+    axios.post(BASE_URL + "signup", data).then((res) => {
+      console.log(res);
+      if (res.data) {
+        alert("success");
+      } else {
+        alert("error ");
+      }
+    });
+  };
 
   return (
-    <div className='sections'>
+    <div className="sections">
       <div className="login-block">
         <h2>Chit Chat</h2>
         <form action="" className="login-form common-form">
-          <input type="text" placeholder='Name' autoComplete='false' value={name} onChange={(e)=>setName(e.target.value)} />
-          <input type="text" placeholder='Email' autoComplete='false' value={email} onChange={(e)=>setEmail(e.target.value)} />
-          <input type="password" placeholder='Password' autoComplete='false' value={password} onChange={(e)=>setPassword(e.target.value)} />
+          <input
+            type="text"
+            placeholder="Name"
+            autoComplete="false"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Email"
+            autoComplete="false"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            autoComplete="false"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
           <div className="file-field input-field">
-          <div className="btn">
-            <span>Upload Profile</span>
-            <input type="file" onChange={(e)=>setImage(e.target.files[0])} />
+            <div className="btn">
+              <span>Upload Profile</span>
+              <input
+                type="file"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+            </div>
+            <div className="file-path-wrapper">
+              <input type="text" className="file-path validate" />
+            </div>
           </div>
-          <div className="file-path-wrapper">
-            <input type="text" className="file-path validate" />
-          </div>
-        </div>
-          <button onClick={(e)=>PostData(e)}>Signup</button>
+          <button onClick={(e) => PostData(e)}>Signup</button>
+          
         </form>
         <div className="extra-info">
-          <Link to="/signin">Already have an account <b>Signin</b></Link>
+          <Link to="/signin">
+            Already have an account <b>Signin</b>
+          </Link>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Signup
+export default Signup;
